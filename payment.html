@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Payment - Halloween Neon Party</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f8fafc; color:#111827; margin:0; }
+    header { background:#ffffff; border-bottom:1px solid #e5e7eb; padding:16px; position:fixed; top:0; left:0; right:0; display:flex; justify-content:center; align-items:center; gap:12px; z-index:10; }
+    main { max-width:420px; margin:96px auto 40px; padding:16px; }
+    .card { background:#fff; border-radius:8px; padding:16px; box-shadow:0 6px 18px rgba(15,23,42,0.06); }
+    h1 { margin:0; font-size:18px; font-weight:700; background:linear-gradient(90deg,#3b82f6,#ec4899); -webkit-background-clip:text; color:transparent; }
+    .summary p { margin:8px 0; }
+    .total { font-weight:700; margin-top:8px; }
+    .input { width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; }
+    .btn { display:block; width:100%; text-align:center; padding:12px; background:#ef4444; color:#fff; border-radius:8px; text-decoration:none; font-weight:700; margin-top:12px; }
+    .btn:disabled { opacity:0.6; pointer-events:none; }
+    .small { font-size:13px; color:#6b7280; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="your-logo.png" alt="Logo" width="36" height="36" style="object-fit:contain;" />
+    <h1>BLACK STORM PRODUCTIONS</h1>
+  </header>
+
+  <main>
+    <a href="tickets.html" style="color:#2563eb; font-weight:600; text-decoration:none;">← Back to Tickets</a>
+
+    <h2 style="margin-top:16px; margin-bottom:8px; font-size:20px;">Payment Details</h2>
+    <p class="small">Complete your purchase securely below.</p>
+
+    <div class="card summary" id="summaryCard" aria-live="polite">
+      <h3 style="margin-top:0;">Order Summary</h3>
+      <div id="orderItems"></div>
+      <div class="total">Total: <span id="totalPrice">€0.00</span></div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <label style="display:block; margin-bottom:8px;">Full Name
+        <input id="fullName" class="input" type="text" placeholder="Your name" />
+      </label>
+
+      <label style="display:block; margin-bottom:8px;">Email
+        <input id="email" class="input" type="email" placeholder="you@example.com" />
+      </label>
+
+      <!-- Payment link button. Replace STRIPE_PAYMENT_LINK below with your real Stripe payment link. -->
+      <a id="payNow" class="btn" href="#" role="button">PAY NOW</a>
+      <div class="small">You will be redirected to Stripe's secure checkout.</div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/YOUR_REAL_STRIPE_LINK';
+      var orderItemsEl = document.getElementById('orderItems');
+      var totalPriceEl = document.getElementById('totalPrice');
+      var payNowEl = document.getElementById('payNow');
+
+      // Read stored tickets safely
+      var tickets = [];
+      var total = 0;
+
+      try {
+        var raw = localStorage.getItem('selectedTickets');
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            tickets = parsed;
+          }
+        }
+      } catch (e) {
+        console.error('Error reading selectedTickets from localStorage', e);
+        tickets = [];
+      }
+
+      // Render summary
+      if (tickets.length === 0) {
+        orderItemsEl.innerHTML = '<p style="color:#6b7280; margin:8px 0;">No ticket details found.</p>';
+        total = 0;
+      } else {
+        total = 0;
+        var fragment = document.createDocumentFragment();
+        for (var i = 0; i < tickets.length; i += 1) {
+          var t = tickets[i];
+          var qty = Number(t.quantity) || 0;
+          var price = Number(t.price) || 0;
+          var line = document.createElement('p');
+          line.textContent = t.name + ' ×' + qty + ' — €' + (price * qty).toFixed(2);
+          fragment.appendChild(line);
+          total += price * qty;
+        }
+        orderItemsEl.appendChild(fragment);
+      }
+
+      totalPriceEl.textContent = '€' + (total || 0).toFixed(2);
+
+      // Set payment link behavior
+      payNowEl.addEventListener('click', function (evt) {
+        evt.preventDefault();
+
+        var nameInput = document.getElementById('fullName');
+        var emailInput = document.getElementById('email');
+        var nameVal = (nameInput.value || '').trim();
+        var emailVal = (emailInput.value || '').trim();
+
+        if (!nameVal || !emailVal) {
+          window.alert('Please enter your full name and email before proceeding to payment.');
+          return;
+        }
+
+        if (!tickets || tickets.length === 0 || total <= 0) {
+          window.alert('No tickets selected. Please go back to the tickets page.');
+          window.location.href = 'tickets.html';
+          return;
+        }
+
+        if (!STRIPE_PAYMENT_LINK || STRIPE_PAYMENT_LINK.indexOf('https://buy.stripe.com/') !== 0) {
+          window.alert('Payment link not configured. Contact the site administrator.');
+          return;
+        }
+
+        // Open the Stripe Payment Link in a new tab (so user can return)
+        window.open(STRIPE_PAYMENT_LINK, '_blank', 'noopener,noreferrer');
+      });
+    }());
+  </script>
+</body>
+</html>

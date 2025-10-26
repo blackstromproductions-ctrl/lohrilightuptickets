@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>❌ Payment Canceled</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glow-text {
+      background: linear-gradient(to right, #3b82f6, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(59, 130, 246, 0.6),
+                   0 0 25px rgba(236, 72, 153, 0.5);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans flex flex-col items-center justify-center h-screen">
+  <div class="text-center p-8 bg-white rounded-2xl shadow-lg max-w-md">
+    <h1 class="text-3xl font-extrabold glow-text mb-4">BLACK STROM PRODUCTIONS</h1>
+    <h2 class="text-2xl font-bold text-red-500 mb-2">⚠ Payment Canceled</h2>
+    <p class="text-gray-600 mb-6">It looks like you canceled your payment.<br>You can try again anytime.</p>
+    <a href="payment.html" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">
+      Try Again
+    </a>
+  </div>
+</body>
+</html>
